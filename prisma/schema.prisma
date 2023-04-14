@@ -1,0 +1,135 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id               String            @id @default(uuid())
+  email            String
+  senha            String
+  telefone         String
+  foto             String
+  biografia        String?
+  pessoa_fisica    PessoaFisica[]
+  pessoa_juridica  PessoaJuridica[]
+  catador          Catador[]
+  endereco_usuario EnderecoUsuario[]
+  gerador          Gerador[]
+
+  @@map("tbl_usuario")
+}
+
+model PessoaFisica {
+  id              String   @id @default(uuid())
+  cpf             String
+  nome            String
+  data_nascimento DateTime
+
+  user       Usuario @relation(fields: [id_usuario], references: [id])
+  id_usuario String
+
+  @@map("tbl_pessoa_fisica")
+}
+
+model PessoaJuridica {
+  id            String @id @default(uuid())
+  cnpj          String
+  nome_fantasia String
+
+  user       Usuario @relation(fields: [id_usuario], references: [id])
+  id_usuario String
+}
+
+model Catador {
+  id                String             @id @default(uuid())
+  user              Usuario            @relation(fields: [id_usuario], references: [id])
+  status            String?
+  id_usuario        String
+  materiais_catador MateriaisCatador[]
+  FavoritarCatador  FavoritarCatador[]
+  Pedido            Pedido[]
+}
+
+model Materiais {
+  id                String             @id @default(uuid())
+  nome              String
+  materiais_catador MateriaisCatador[]
+  MateriaisPedido   MateriaisPedido[]
+}
+
+model MateriaisCatador {
+  id           String    @id @default(uuid())
+  material     Materiais @relation(fields: [id_materiais], references: [id])
+  id_materiais String
+  catador      Catador   @relation(fields: [id_catador], references: [id])
+  id_catador   String
+}
+
+model Endereco {
+  id               String            @id @default(uuid())
+  logradouro       String
+  bairro           String
+  cidade           String
+  estado           String
+  cep              String
+  complemento      String?
+  latitude         String
+  longitude        String
+  apelido          String
+  numero           String
+  endereco_usuario EnderecoUsuario[]
+  Pedido           Pedido[]
+}
+
+model EnderecoUsuario {
+  id          String   @id @default(uuid())
+  endereco    Endereco @relation(fields: [id_endereco], references: [id])
+  usuario     Usuario  @relation(fields: [id_usuario], references: [id])
+  id_endereco String
+  id_usuario  String
+}
+
+model Gerador {
+  id               String             @id @default(uuid())
+  user             Usuario            @relation(fields: [id_usuario], references: [id])
+  id_usuario       String
+  FavoritarCatador FavoritarCatador[]
+  Pedido           Pedido[]
+}
+
+model FavoritarCatador {
+  id         String  @id @default(uuid())
+  catador    Catador @relation(fields: [id_catador], references: [id])
+  id_catador String
+  gerador    Gerador @relation(fields: [id_gerador], references: [id])
+  id_gerador String
+}
+
+model MateriaisPedido {
+  id          String    @id @default(uuid())
+  material    Materiais @relation(fields: [id_material], references: [id])
+  id_material String
+  pedido      Pedido    @relation(fields: [id_pedido], references: [id])
+  id_pedido   String
+}
+
+model Pedido {
+  id              String            @id @default(uuid())
+  created_at      DateTime          @default(now())
+  status          String
+  finished_at     DateTime?
+  catador         Catador?          @relation(fields: [id_catador], references: [id])
+  id_catador      String?
+  gerador         Gerador           @relation(fields: [id_gerador], references: [id])
+  id_gerador      String
+  endereco        Endereco          @relation(fields: [id_endereco], references: [id])
+  id_endereco     String
+  MateriaisPedido MateriaisPedido[]
+}
