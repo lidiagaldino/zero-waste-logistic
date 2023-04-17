@@ -1,42 +1,56 @@
-import app from './app'
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import normalizePort from './utils/normalizePort'
-import { IPayload } from './interfaces/Jwt'
+import app from "./app";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import normalizePort from "./utils/normalizePort";
 
-const port = normalizePort(process.env.PORT || '3000')
+import Queue from "./repository/Queue";
 
-app.io.on('connection', async socket => {
-    console.log(`CLIENTE CONECTADO ${socket.id}`)
+interface IPayload extends JwtPayload {
+  id_usuario: string;
+  id_modo: string;
+  user_type: "CATADOR" | "GERADOR";
+}
 
-    let decoded: IPayload
+const port = normalizePort(process.env.PORT || "3000");
 
-    if (!socket.handshake.auth || !socket.handshake.auth.token) socket.disconnect()
+app.io.on("connection", async (socket) => {
+  console.log(`CLIENTE CONECTADO ${socket.id}`);
 
-    decoded = jwt.verify(socket.handshake.auth.token, 'secret') as IPayload
-    console.log(decoded);
+  let decoded: IPayload;
 
-    if (decoded.user_type === 'CATADOR') {
-        socket.join(`catador_${decoded.id_modo}`)
-        console.log('catador')
-        return null
-    }
+  if (!socket.handshake.auth || !socket.handshake.auth.token)
+    socket.disconnect();
 
-    if (decoded.user_type === 'GERADOR') {
-        socket.join(`gerador_${decoded.id_modo}`)
-        console.log('gerador')
-        return null
-    }
+  decoded = jwt.verify(socket.handshake.auth.token, "secret") as IPayload;
+  console.log(decoded.id_modo);
 
-    socket.on('pedidoCriado', (pedido) => {
-        // Enviar notificação para o entregador informando que um novo pedido foi criado
-        socket.broadcast.emit('novoPedido', pedido);
-    });
+  if (decoded.user_type === "CATADOR") {
+    socket.join(`catador_${decoded.id_modo}`);
+    console.log("catador");
+    return null;
+  }
 
-    // Defina um evento personalizado para quando um pedido for aceito
-    socket.on('pedidoAceito', (pedido) => {
-        // Enviar notificação para o cliente informando que o pedido foi aceito
-        socket.broadcast.emit('pedidoAceito', pedido);
-    });
-})
+  if (decoded.user_type === "GERADOR") {
+    socket.join(`gerador_${decoded.id_modo}`);
+    console.log("gerador");
+    return null;
+  }
 
-app.httpServer.listen(port, () => console.log('App rodando'))
+  socket.on("newOrder", (order) => {
+    socket.broadcast.emit("newOrder", order);
+  });
+
+  socket.on("acceptOrder", (order) => {
+    socket.broadcast.emit("acceptOrder", order);
+  });
+
+  socket.on("denyOrder", (order) => {
+    if (decoded.user_type != "CATADOR") return null;
+
+    Queue.deleteFromQueueById({ id: order.id_catador });
+    const queue = Queue.getQueue();
+    console.log(queue[0]);
+    socket.to(`catador_${queue[0].id}`).emit("newOrder", order);
+  });
+});
+
+app.httpServer.listen(port, () => console.log("App rodando"));

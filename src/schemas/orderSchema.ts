@@ -3,7 +3,7 @@ import IOrder from '../interfaces/Order';
 
 interface IBodyProps extends Omit<IOrder, 'id'> { }
 
-export const createOrderValidation: yup.SchemaOf<IBodyProps> = yup.object().shape({
+export const orderBodyValidation: yup.SchemaOf<IBodyProps> = yup.object().shape({
     status: yup.string().required(),
     id_endereco: yup.string().uuid().required(),
     id_gerador: yup.string().uuid().required(),
