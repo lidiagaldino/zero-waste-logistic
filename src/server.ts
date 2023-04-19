@@ -20,7 +20,12 @@ app.io.on("connection", async (socket) => {
   if (!socket.handshake.auth || !socket.handshake.auth.token)
     socket.disconnect();
 
-  decoded = jwt.verify(socket.handshake.auth.token, "secret") as IPayload;
+  try {
+    decoded = jwt.verify(socket.handshake.auth.token, "secret") as IPayload;
+  } catch (error) {
+    socket.disconnect();
+  }
+
   console.log(decoded.id_modo);
 
   if (decoded.user_type === "CATADOR") {
@@ -46,10 +51,10 @@ app.io.on("connection", async (socket) => {
   socket.on("denyOrder", (order) => {
     if (decoded.user_type != "CATADOR") return null;
 
-    Queue.deleteFromQueueById({ id: order.id_catador });
-    const queue = Queue.getQueue();
-    console.log(queue[0]);
-    socket.to(`catador_${queue[0].id}`).emit("newOrder", order);
+    // Queue.deleteFromQueueById({ id: order.id_catador });
+    // const queue = Queue.getQueue();
+    // console.log(queue[0]);
+    // socket.to(`catador_${queue[0].id}`).emit("newOrder", order);
   });
 });
 

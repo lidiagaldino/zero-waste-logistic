@@ -19,9 +19,17 @@ class OrderController {
         (await FindNearestCollector.findNearestCollector(body.id_endereco)) as {
           id: string;
         }[];
-      Queue.setQueue(queue);
-      console.log(queue[0]);
-      app.io.to(`catador_${queue[0].id}`).emit("newOrder", order);
+
+      let list: string[] = [];
+
+      queue.map((item) => {
+        console.log(item.id);
+        list.push(item.id);
+      });
+
+      Queue.setQueue(list);
+
+      app.io.to(`catador_${list[0]}`).emit("newOrder", order);
       return res.status(StatusCodes.CREATED).json(order);
     }
 
@@ -50,6 +58,17 @@ class OrderController {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Algo deu errado" });
+  }
+
+  public async denyOrder(req: Request<TParams, {}, IOrder>, res: Response) {
+    const body = req.body;
+
+    Queue.deleteFromQueueById(body.id_catador);
+    const queue = Queue.getQueue();
+
+    body.id_catador = null;
+    app.io.to(`catador_${queue[0]}`).emit("newOrder", body);
+    return res.status(StatusCodes.OK).json({});
   }
 }
 

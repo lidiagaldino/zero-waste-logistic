@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Usuario {
-  id               String            @id @default(uuid())
+  id               Int               @id @default(autoincrement())
   email            String
   senha            String
   telefone         String
@@ -27,53 +27,53 @@ model Usuario {
 }
 
 model PessoaFisica {
-  id              String   @id @default(uuid())
+  id              Int      @id @default(autoincrement())
   cpf             String
   nome            String
   data_nascimento DateTime
 
   user       Usuario @relation(fields: [id_usuario], references: [id])
-  id_usuario String
+  id_usuario Int
 
   @@map("tbl_pessoa_fisica")
 }
 
 model PessoaJuridica {
-  id            String @id @default(uuid())
+  id            Int    @id @default(autoincrement())
   cnpj          String
   nome_fantasia String
 
   user       Usuario @relation(fields: [id_usuario], references: [id])
-  id_usuario String
+  id_usuario Int
 }
 
 model Catador {
-  id                String             @id @default(uuid())
+  id                Int                @id @default(autoincrement())
   user              Usuario            @relation(fields: [id_usuario], references: [id])
   status            String?
-  id_usuario        String
+  id_usuario        Int
   materiais_catador MateriaisCatador[]
   FavoritarCatador  FavoritarCatador[]
   Pedido            Pedido[]
 }
 
 model Materiais {
-  id                String             @id @default(uuid())
+  id                Int                @id @default(autoincrement())
   nome              String
   materiais_catador MateriaisCatador[]
   MateriaisPedido   MateriaisPedido[]
 }
 
 model MateriaisCatador {
-  id           String    @id @default(uuid())
+  id           Int       @id @default(autoincrement())
   material     Materiais @relation(fields: [id_materiais], references: [id])
-  id_materiais String
+  id_materiais Int
   catador      Catador   @relation(fields: [id_catador], references: [id])
-  id_catador   String
+  id_catador   Int
 }
 
 model Endereco {
-  id               String            @id @default(uuid())
+  id               Int               @id @default(autoincrement())
   logradouro       String
   bairro           String
   cidade           String
@@ -89,47 +89,47 @@ model Endereco {
 }
 
 model EnderecoUsuario {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   endereco    Endereco @relation(fields: [id_endereco], references: [id])
   usuario     Usuario  @relation(fields: [id_usuario], references: [id])
-  id_endereco String
-  id_usuario  String
+  id_endereco Int
+  id_usuario  Int
 }
 
 model Gerador {
-  id               String             @id @default(uuid())
+  id               Int                @id @default(autoincrement())
   user             Usuario            @relation(fields: [id_usuario], references: [id])
-  id_usuario       String
+  id_usuario       Int
   FavoritarCatador FavoritarCatador[]
   Pedido           Pedido[]
 }
 
 model FavoritarCatador {
-  id         String  @id @default(uuid())
+  id         Int     @id @default(autoincrement())
   catador    Catador @relation(fields: [id_catador], references: [id])
-  id_catador String
+  id_catador Int
   gerador    Gerador @relation(fields: [id_gerador], references: [id])
-  id_gerador String
+  id_gerador Int
 }
 
 model MateriaisPedido {
-  id          String    @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   material    Materiais @relation(fields: [id_material], references: [id])
-  id_material String
+  id_material Int
   pedido      Pedido    @relation(fields: [id_pedido], references: [id])
-  id_pedido   String
+  id_pedido   Int
 }
 
 model Pedido {
-  id              String            @id @default(uuid())
+  id              Int               @id @default(autoincrement())
   created_at      DateTime          @default(now())
   status          String
   finished_at     DateTime?
   catador         Catador?          @relation(fields: [id_catador], references: [id])
-  id_catador      String?
+  id_catador      Int?
   gerador         Gerador           @relation(fields: [id_gerador], references: [id])
-  id_gerador      String
+  id_gerador      Int
   endereco        Endereco          @relation(fields: [id_endereco], references: [id])
-  id_endereco     String
+  id_endereco     Int
   MateriaisPedido MateriaisPedido[]
 }
