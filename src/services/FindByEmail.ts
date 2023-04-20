@@ -1,4 +1,3 @@
-import { Catador } from "@prisma/client";
 import IUser from "../interfaces/User";
 import prisma from "../lib/db";
 
