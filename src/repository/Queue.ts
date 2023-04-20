@@ -1,15 +1,15 @@
 class Queue {
-  private queue: string[];
+  private queue: number[];
 
   public getQueue() {
     return this.queue;
   }
 
-  public setQueue(newQueue: string[]) {
+  public setQueue(newQueue: number[]) {
     this.queue = newQueue;
   }
 
-  public deleteFromQueueById(id: string) {
+  public deleteFromQueueById(id: number) {
     console.log(id + " oidoioioiiiiiiiiiiiii");
     console.log(this.queue);
     const index = this.queue.indexOf(id);

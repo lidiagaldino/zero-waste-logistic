@@ -1,18 +1,18 @@
 import prisma from "../lib/db";
 
 class FindGenerator {
-    public async findGenerator(id: string){
-        const gerador = await prisma.gerador.findUnique({
-            where: {
-                id
-            },
-            include: {
-                user: true
-            }
-        })
+  public async findGenerator(id: number) {
+    const gerador = await prisma.gerador.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        user: true,
+      },
+    });
 
-        return gerador
-    }
+    return gerador;
+  }
 }
 
-export default new FindGenerator()
+export default new FindGenerator();

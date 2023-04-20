@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Usuario {
-  id               Int               @id @default(autoincrement())
+  id               Int               @id @unique @default(autoincrement())
   email            String
   senha            String
   telefone         String
@@ -27,7 +27,7 @@ model Usuario {
 }
 
 model PessoaFisica {
-  id              Int      @id @default(autoincrement())
+  id              Int      @id @unique @default(autoincrement())
   cpf             String
   nome            String
   data_nascimento DateTime
@@ -39,22 +39,26 @@ model PessoaFisica {
 }
 
 model PessoaJuridica {
-  id            Int    @id @default(autoincrement())
+  id            Int    @id @unique @default(autoincrement())
   cnpj          String
   nome_fantasia String
 
   user       Usuario @relation(fields: [id_usuario], references: [id])
   id_usuario Int
+
+  @@map("tbl_pessoa_juridica")
 }
 
 model Catador {
-  id                Int                @id @default(autoincrement())
+  id                Int                @id @unique @default(autoincrement())
   user              Usuario            @relation(fields: [id_usuario], references: [id])
   status            String?
   id_usuario        Int
   materiais_catador MateriaisCatador[]
   FavoritarCatador  FavoritarCatador[]
   Pedido            Pedido[]
+
+  @@map("tbl_catador")
 }
 
 model Materiais {
@@ -62,18 +66,22 @@ model Materiais {
   nome              String
   materiais_catador MateriaisCatador[]
   MateriaisPedido   MateriaisPedido[]
+
+  @@map("tbl_materiais")
 }
 
 model MateriaisCatador {
-  id           Int       @id @default(autoincrement())
+  id           Int       @id @unique @default(autoincrement())
   material     Materiais @relation(fields: [id_materiais], references: [id])
   id_materiais Int
   catador      Catador   @relation(fields: [id_catador], references: [id])
   id_catador   Int
+
+  @@map("tbl_materiais_catador")
 }
 
 model Endereco {
-  id               Int               @id @default(autoincrement())
+  id               Int               @id @unique @default(autoincrement())
   logradouro       String
   bairro           String
   cidade           String
@@ -86,42 +94,52 @@ model Endereco {
   numero           String
   endereco_usuario EnderecoUsuario[]
   Pedido           Pedido[]
+
+  @@map("tbl_endereco")
 }
 
 model EnderecoUsuario {
-  id          Int      @id @default(autoincrement())
+  id          Int      @id @unique @default(autoincrement())
   endereco    Endereco @relation(fields: [id_endereco], references: [id])
   usuario     Usuario  @relation(fields: [id_usuario], references: [id])
   id_endereco Int
   id_usuario  Int
+
+  @@map("tbl_endereco_usuario")
 }
 
 model Gerador {
-  id               Int                @id @default(autoincrement())
+  id               Int                @id @unique @default(autoincrement())
   user             Usuario            @relation(fields: [id_usuario], references: [id])
   id_usuario       Int
   FavoritarCatador FavoritarCatador[]
   Pedido           Pedido[]
+
+  @@map("tbl_gerador")
 }
 
 model FavoritarCatador {
-  id         Int     @id @default(autoincrement())
+  id         Int     @id @unique @default(autoincrement())
   catador    Catador @relation(fields: [id_catador], references: [id])
   id_catador Int
   gerador    Gerador @relation(fields: [id_gerador], references: [id])
   id_gerador Int
+
+  @@map("tbl_favoritar_catador")
 }
 
 model MateriaisPedido {
-  id          Int       @id @default(autoincrement())
+  id          Int       @id @unique @default(autoincrement())
   material    Materiais @relation(fields: [id_material], references: [id])
   id_material Int
   pedido      Pedido    @relation(fields: [id_pedido], references: [id])
   id_pedido   Int
+
+  @@map("tbl_materiais_pedido")
 }
 
 model Pedido {
-  id              Int               @id @default(autoincrement())
+  id              Int               @id @unique @default(autoincrement())
   created_at      DateTime          @default(now())
   status          String
   finished_at     DateTime?
@@ -132,4 +150,6 @@ model Pedido {
   endereco        Endereco          @relation(fields: [id_endereco], references: [id])
   id_endereco     Int
   MateriaisPedido MateriaisPedido[]
+
+  @@map("tbl_pedido")
 }

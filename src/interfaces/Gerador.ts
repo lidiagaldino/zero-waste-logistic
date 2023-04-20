@@ -1,4 +1,4 @@
 export default interface IGerador {
-  id: string;
-  id_usuario: string;
+  id: number;
+  id_usuario: number;
 }

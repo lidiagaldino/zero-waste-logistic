@@ -12,7 +12,7 @@ class CreateOrder {
         },
       });
 
-      let data: { id_material: string; id_pedido: string }[] = [];
+      let data: { id_material: number; id_pedido: number }[] = [];
 
       order.id_materiais.forEach((item) =>
         data.push({ id_material: item, id_pedido: newOrder.id })

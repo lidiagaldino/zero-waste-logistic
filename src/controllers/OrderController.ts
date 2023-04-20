@@ -15,12 +15,12 @@ class OrderController {
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
-      const queue: { id: string }[] =
+      const queue: { id: number }[] =
         (await FindNearestCollector.findNearestCollector(body.id_endereco)) as {
-          id: string;
+          id: number;
         }[];
 
-      let list: string[] = [];
+      let list: number[] = [];
 
       queue.map((item) => {
         console.log(item.id);
@@ -48,7 +48,10 @@ class OrderController {
         .status(StatusCodes.BAD_REQUEST)
         .json({ errorsResult: "ID do catador é necessário" });
 
-    const updateOrder = await AcceptOrder.acceptOrder(id, body.id_catador);
+    const updateOrder = await AcceptOrder.acceptOrder(
+      Number(id),
+      body.id_catador
+    );
 
     if (updateOrder) {
       app.io.to(`gerador_${body.id_gerador}`).emit("acceptOrder", updateOrder);

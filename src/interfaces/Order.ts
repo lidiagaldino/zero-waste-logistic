@@ -1,10 +1,10 @@
-export default interface IOrder{
-    id: string,
-    id_materiais: [string],
-    id_gerador: string,
-    id_catador?: string ,
-    id_endereco: string,
-    created_at?: Date,
-    finished_at?: Date,
-    status: string
+export default interface IOrder {
+  id: number;
+  id_materiais: [number];
+  id_gerador: number;
+  id_catador?: number;
+  id_endereco: number;
+  created_at?: Date;
+  finished_at?: Date;
+  status: string;
 }

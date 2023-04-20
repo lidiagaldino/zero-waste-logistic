@@ -1,5 +1,5 @@
 type TParams = {
-    id: string
-}
+  id: string;
+};
 
-export default TParams
+export default TParams;

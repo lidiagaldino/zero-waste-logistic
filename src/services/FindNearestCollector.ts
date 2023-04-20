@@ -1,16 +1,16 @@
 import prisma from "../lib/db";
 
 class FindNearestCollector {
-    public async findNearestCollector(id: string){
-        const getLatLong = await prisma.endereco.findUnique({
-            where: {
-                id
-            }
-        })
+  public async findNearestCollector(id: number) {
+    const getLatLong = await prisma.endereco.findUnique({
+      where: {
+        id,
+      },
+    });
 
-        if (!getLatLong) return false
+    if (!getLatLong) return false;
 
-        const sql = `
+    const sql = `
         SELECT Catador.id as id, tbl_usuario.id as id_usuario, logradouro, cidade, numero, tbl_usuario.foto, tbl_pessoa_fisica.nome, PessoaJuridica.nome_fantasia, ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distance
                 FROM Endereco
                 INNER JOIN EnderecoUsuario
@@ -25,12 +25,12 @@ class FindNearestCollector {
                     ON Catador.id_usuario = tbl_usuario.id
                 WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) <= 10000
                 ORDER BY distance
-            LIMIT 10;`
+            LIMIT 10;`;
 
-        const queue = await prisma.$queryRawUnsafe(sql)
+    const queue = await prisma.$queryRawUnsafe(sql);
 
-        return queue
-    }
+    return queue;
+  }
 }
 
-export default new FindNearestCollector()
+export default new FindNearestCollector();
