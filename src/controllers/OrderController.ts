@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import Queue from "../repository/Queue";
 import TParams from "../interfaces/Params";
 import AcceptOrder from "../services/AcceptOrder";
+import FindOrder from "../services/findOrder";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
@@ -15,16 +16,19 @@ class OrderController {
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
-      const queue: { id: number }[] =
-        (await FindNearestCollector.findNearestCollector(body.id_endereco)) as {
-          id: number;
+      const queue: { id_catador: number }[] =
+        (await FindNearestCollector.findNearestCollector(
+          body.id_endereco,
+          body.id_materiais
+        )) as {
+          id_catador: number;
         }[];
 
       let list: number[] = [];
 
       queue.map((item) => {
-        console.log(item.id);
-        list.push(item.id);
+        console.log(item.id_catador);
+        list.push(item.id_catador);
       });
 
       Queue.setQueue(list);
@@ -36,25 +40,25 @@ class OrderController {
     return res.send(order);
   }
 
-  public async update(
-    req: Request<TParams, {}, Omit<IOrder, "id">>,
-    res: Response
-  ) {
+  public async update(req: Request<TParams, {}, {}>, res: Response) {
     const { id } = req.params;
     const body = req.body;
 
-    if (!body.id_catador)
+    if (!req.user.id_modo)
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ errorsResult: "ID do catador é necessário" });
 
     const updateOrder = await AcceptOrder.acceptOrder(
       Number(id),
-      body.id_catador
+      req.user.id_modo
     );
 
     if (updateOrder) {
-      app.io.to(`gerador_${body.id_gerador}`).emit("acceptOrder", updateOrder);
+      app.io
+        .to(`gerador_${updateOrder.id_gerador}`)
+        .emit("acceptOrder", updateOrder);
+      app.io.to(`catador_${req.user.id_modo}`).emit("acceptOrder", updateOrder);
       return res.status(StatusCodes.OK).json(updateOrder);
     }
 
@@ -63,14 +67,20 @@ class OrderController {
       .json({ message: "Algo deu errado" });
   }
 
-  public async denyOrder(req: Request<TParams, {}, IOrder>, res: Response) {
-    const body = req.body;
+  public async denyOrder(req: Request<TParams, {}, {}>, res: Response) {
+    const { id } = req.params;
 
-    Queue.deleteFromQueueById(body.id_catador);
+    const order = await FindOrder.findOrder(Number(id));
+
+    if (!order)
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ errorsResult: "Pedido não existe" });
+
+    Queue.deleteFromQueueById(req.user.id_modo);
     const queue = Queue.getQueue();
 
-    body.id_catador = null;
-    app.io.to(`catador_${queue[0]}`).emit("newOrder", body);
+    app.io.to(`catador_${queue[0]}`).emit("newOrder", order);
     return res.status(StatusCodes.OK).json({});
   }
 }

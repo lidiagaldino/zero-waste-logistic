@@ -1,7 +1,7 @@
 import prisma from "../lib/db";
 
 class FindNearestCollector {
-  public async findNearestCollector(id: number) {
+  public async findNearestCollector(id: number, materiais: number[]) {
     const getLatLong = await prisma.endereco.findUnique({
       where: {
         id,
@@ -11,7 +11,9 @@ class FindNearestCollector {
     if (!getLatLong) return false;
 
     const sql = `
-    SELECT tbl_catador.id as id_catador, ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distance
+    SELECT tbl_catador.id as id_catador, ST_DISTANCE_SPHERE(POINT(${
+      getLatLong.latitude
+    }, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distance
     FROM tbl_endereco
     INNER JOIN tbl_endereco_usuario
         ON tbl_endereco_usuario.id_endereco = tbl_endereco.id
@@ -27,11 +29,15 @@ class FindNearestCollector {
         ON tbl_catador.id = tbl_materiais_catador.id_catador
     INNER JOIN tbl_materiais
         ON tbl_materiais.id = tbl_materiais_catador.id_materiais
-    WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) <= 10000 AND id_materiais in (1,2) GROUP BY id_catador, longitude, latitude HAVING count(id_catador) >= (SELECT count(*) AS id FROM tbl_materiais WHERE id IN(1,2))
+    WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${
+      getLatLong.longitude
+    }), POINT(latitude, longitude)) <= 10000 AND id_materiais in (${materiais.toString()}) GROUP BY id_catador, longitude, latitude HAVING count(id_catador) >= (SELECT count(*) AS id FROM tbl_materiais WHERE id IN(${materiais.toString()}))
     ORDER BY distance
     LIMIT 10;`;
 
     const queue = await prisma.$queryRawUnsafe(sql);
+
+    console.log(queue);
 
     return queue;
   }
