@@ -8,7 +8,7 @@ class CollectorStatus {
           id,
         },
         data: {
-          status: "available",
+          id_status_catador: 1,
         },
       });
 
@@ -25,7 +25,7 @@ class CollectorStatus {
           id,
         },
         data: {
-          status: "busy",
+          id_status_catador: 3,
         },
       });
 
@@ -42,7 +42,7 @@ class CollectorStatus {
           id,
         },
         data: {
-          status: "unavailable",
+          id_status_catador: 2,
         },
       });
 

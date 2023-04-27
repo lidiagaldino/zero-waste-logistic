@@ -8,8 +8,8 @@ class AcceptOrder {
           id,
         },
         data: {
-          status: "em andamento",
           id_catador,
+          id_status: 1,
         },
       });
 

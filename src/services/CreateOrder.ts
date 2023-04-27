@@ -6,7 +6,7 @@ class CreateOrder {
     try {
       const newOrder = await prisma.pedido.create({
         data: {
-          status: "pendente",
+          id_status: 2,
           id_gerador: order.id_gerador,
           id_endereco: order.id_endereco,
         },
@@ -27,6 +27,20 @@ class CreateOrder {
       return newOrder;
     } catch (error) {
       console.log(error);
+      return false;
+    }
+  }
+
+  public async deleteOrder(id: number) {
+    try {
+      const result = await prisma.pedido.delete({
+        where: {
+          id,
+        },
+      });
+
+      return result;
+    } catch (error) {
       return false;
     }
   }

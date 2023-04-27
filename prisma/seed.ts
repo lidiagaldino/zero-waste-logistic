@@ -48,7 +48,11 @@ async function main() {
         },
         catador: {
           create: {
-            status: "disponivel",
+            status_catador: {
+              create: {
+                status: "unavailable",
+              },
+            },
             materiais_catador: {
               create: {
                 material: {
@@ -96,7 +100,11 @@ async function main() {
         },
         catador: {
           create: {
-            status: "disponivel",
+            status_catador: {
+              create: {
+                status: "available",
+              },
+            },
             materiais_catador: {
               create: {
                 material: {

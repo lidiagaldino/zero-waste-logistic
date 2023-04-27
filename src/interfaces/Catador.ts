@@ -1,5 +1,5 @@
 export default interface ICatador {
   id: number;
-  status: string | null;
+  id_status_catador: number | null;
   id_usuario: number;
 }

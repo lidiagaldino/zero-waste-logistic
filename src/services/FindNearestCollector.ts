@@ -13,7 +13,7 @@ class FindNearestCollector {
     const sql = `
     SELECT tbl_catador.id as id_catador, ST_DISTANCE_SPHERE(POINT(${
       getLatLong.latitude
-    }, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distance
+    }, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distancia
     FROM tbl_endereco
     INNER JOIN tbl_endereco_usuario
         ON tbl_endereco_usuario.id_endereco = tbl_endereco.id
@@ -32,7 +32,7 @@ class FindNearestCollector {
     WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${
       getLatLong.longitude
     }), POINT(latitude, longitude)) <= 10000 AND id_materiais in (${materiais.toString()}) GROUP BY id_catador, longitude, latitude HAVING count(id_catador) >= (SELECT count(*) AS id FROM tbl_materiais WHERE id IN(${materiais.toString()}))
-    ORDER BY distance
+    ORDER BY distancia
     LIMIT 10;`;
 
     const queue = await prisma.$queryRawUnsafe(sql);

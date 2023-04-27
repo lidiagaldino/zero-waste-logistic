@@ -4,10 +4,10 @@ import CreateOrder from "../services/CreateOrder";
 import app from "../app";
 import FindNearestCollector from "../services/FindNearestCollector";
 import { StatusCodes } from "http-status-codes";
-import Queue from "../repository/Queue";
 import TParams from "../interfaces/Params";
 import AcceptOrder from "../services/AcceptOrder";
-import FindOrder from "../services/findOrder";
+import FindOrder from "../services/FindOrder";
+import Queue from "../services/Queue";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
@@ -16,24 +16,23 @@ class OrderController {
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
-      const queue: { id_catador: number }[] =
+      const queue: { id_catador: number; distancia: number }[] =
         (await FindNearestCollector.findNearestCollector(
           body.id_endereco,
           body.id_materiais
         )) as {
           id_catador: number;
+          distancia: number;
         }[];
 
-      let list: number[] = [];
+      const createQueue = await Queue.storeQueue(queue, order.id);
+      console.log(createQueue);
+      if (!createQueue) {
+        await CreateOrder.deleteOrder(order.id);
+        return res.send("ada");
+      }
 
-      queue.map((item) => {
-        console.log(item.id_catador);
-        list.push(item.id_catador);
-      });
-
-      Queue.setQueue(list);
-
-      app.io.to(`catador_${list[0]}`).emit("newOrder", order);
+      app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
       return res.status(StatusCodes.CREATED).json(order);
     }
 
@@ -42,7 +41,6 @@ class OrderController {
 
   public async update(req: Request<TParams, {}, {}>, res: Response) {
     const { id } = req.params;
-    const body = req.body;
 
     if (!req.user.id_modo)
       return res
@@ -77,8 +75,8 @@ class OrderController {
         .status(StatusCodes.BAD_REQUEST)
         .json({ errorsResult: "Pedido não existe" });
 
-    Queue.deleteFromQueueById(req.user.id_modo);
-    const queue = Queue.getQueue();
+    Queue.deleteFromQueueById(req.user.id_modo, Number(id));
+    const queue = Queue.getQueue(Number(id));
 
     app.io.to(`catador_${queue[0]}`).emit("newOrder", order);
     return res.status(StatusCodes.OK).json({});
