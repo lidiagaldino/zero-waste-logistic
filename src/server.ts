@@ -33,6 +33,7 @@ app.io.on("connection", async (socket) => {
     decoded = jwt.verify(socket.handshake.auth.token, "secret") as IPayload;
     console.log(decoded);
   } catch (error) {
+    socket.emit("InvalidToken", "token invalido");
     socket.disconnect();
   }
 
@@ -82,6 +83,7 @@ app.io.on("connection", async (socket) => {
       }
     });
   } catch (error) {
+    socket.emit("InvalidToken", "token invalido");
     socket.disconnect();
   }
 });
