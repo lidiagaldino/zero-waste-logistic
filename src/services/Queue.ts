@@ -17,7 +17,7 @@ class Queue {
         data,
       });
 
-      console.log(`${queueRs} oioioi`);
+      console.log(queueRs);
 
       return queueRs ? data : false;
     } catch (error) {
@@ -26,11 +26,13 @@ class Queue {
   }
 
   public async getQueue(id_pedido: number) {
-    const rs = await prisma.filaPedidoCatador.findFirst({
+    const rs = await prisma.filaPedidoCatador.findMany({
       where: {
         id_pedido,
       },
     });
+
+    console.log(rs);
 
     return rs ? rs : false;
   }
@@ -50,11 +52,11 @@ class Queue {
     }
   }
 
-  public async deleteQueue(id: number) {
+  public async deleteQueue(id_pedido: number) {
     try {
-      const result = await prisma.filaPedidoCatador.delete({
+      const result = await prisma.filaPedidoCatador.deleteMany({
         where: {
-          id,
+          id_pedido,
         },
       });
 

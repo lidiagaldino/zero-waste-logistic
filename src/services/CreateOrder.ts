@@ -18,11 +18,11 @@ class CreateOrder {
         data.push({ id_material: item, id_pedido: newOrder.id })
       );
 
-      await prisma.materiaisPedido.createMany({
+      const materiais = await prisma.materiaisPedido.createMany({
         data,
       });
 
-      console.log(newOrder);
+      console.log(materiais);
 
       return newOrder;
     } catch (error) {

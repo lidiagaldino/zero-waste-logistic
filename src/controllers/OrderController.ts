@@ -8,6 +8,8 @@ import TParams from "../interfaces/Params";
 import AcceptOrder from "../services/AcceptOrder";
 import FindOrder from "../services/FindOrder";
 import Queue from "../services/Queue";
+import FinishOrder from "../services/FinishOrder";
+import CollectorStatus from "../services/CollectorStatus";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
@@ -26,17 +28,21 @@ class OrderController {
         }[];
 
       const createQueue = await Queue.storeQueue(queue, order.id);
-      console.log(createQueue);
+
       if (!createQueue) {
         await CreateOrder.deleteOrder(order.id);
-        return res.send("ada");
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ message: "Não foi possível criar a fila" });
       }
 
       app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
       return res.status(StatusCodes.CREATED).json(order);
     }
 
-    return res.send(order);
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Não foi possível cadastrar o pedido" });
   }
 
   public async update(req: Request<TParams, {}, {}>, res: Response) {
@@ -53,6 +59,7 @@ class OrderController {
     );
 
     if (updateOrder) {
+      await CollectorStatus.busyCollector(req.user.id_modo);
       app.io
         .to(`gerador_${updateOrder.id_gerador}`)
         .emit("acceptOrder", updateOrder);
@@ -76,10 +83,42 @@ class OrderController {
         .json({ errorsResult: "Pedido não existe" });
 
     Queue.deleteFromQueueById(req.user.id_modo, Number(id));
-    const queue = Queue.getQueue(Number(id));
+    const queue = await Queue.getQueue(Number(id));
 
-    app.io.to(`catador_${queue[0]}`).emit("newOrder", order);
+    if (!queue) {
+      await CreateOrder.deleteOrder(order.id);
+      app.io
+        .to(`gerador_${order.id_gerador}`)
+        .emit(
+          "orderError",
+          "Seu pedido teve que ser cancelado pois não existem pessoas disponíveis para atende-lo"
+        );
+    }
+
+    app.io.to(`catador_${queue[0].id_catador}`).emit("newOrder", order);
     return res.status(StatusCodes.OK).json({});
+  }
+
+  public async finishOrder(req: Request<TParams, {}, {}>, res: Response) {
+    const { id } = req.params;
+
+    const result = await FinishOrder.finishOrder(Number(id));
+
+    if (result) {
+      const queue = await Queue.deleteQueue(Number(id));
+
+      if (queue) {
+        return res.status(StatusCodes.OK).json(result);
+      }
+
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "Não foi possível deletar a fila" });
+    }
+
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: "Não foi possível finalizar o pedido" });
   }
 }
 

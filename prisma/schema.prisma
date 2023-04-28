@@ -168,18 +168,16 @@ model Pedido {
   created_at        DateTime            @default(now())
   finished_at       DateTime?
   id_catador        Int?
-  id_gerador        Int
   id_endereco       Int
-  geradorId         Int?
+  id_gerador        Int
   MateriaisPedido   MateriaisPedido[]
-  tbl_gerador       Gerador?            @relation(fields: [geradorId], references: [id])
+  tbl_gerador       Gerador             @relation(fields: [id_gerador], references: [id])
   catador           Catador?            @relation(fields: [id_catador], references: [id])
   endereco          Endereco            @relation(fields: [id_endereco], references: [id], onDelete: Cascade)
   status            Status              @relation(fields: [id_status], references: [id])
   id_status         Int
   FilaPedidoCatador FilaPedidoCatador[]
 
-  @@index([geradorId], map: "tbl_pedido_geradorId_fkey")
   @@index([id_catador], map: "tbl_pedido_id_catador_fkey")
   @@index([id_endereco], map: "tbl_pedido_id_endereco_fkey")
   @@index([id_gerador], map: "tbl_pedido_id_gerador_fkey")

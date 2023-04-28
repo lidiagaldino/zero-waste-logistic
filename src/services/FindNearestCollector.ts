@@ -37,7 +37,7 @@ class FindNearestCollector {
 
     const queue = await prisma.$queryRawUnsafe(sql);
 
-    console.log(queue);
+    console.log(sql);
 
     return queue;
   }

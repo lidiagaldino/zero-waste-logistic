@@ -74,6 +74,10 @@ app.io.on("connection", async (socket) => {
       // socket.to(`catador_${queue[0].id}`).emit("newOrder", order);
     });
 
+    socket.on("orderError", (order) => {
+      socket.broadcast.emit("orderError", order);
+    });
+
     socket.on("disconnect", async (reason) => {
       console.log(`CLIENTE DESCONECTADO ${socket.id}: ${reason}`);
 
