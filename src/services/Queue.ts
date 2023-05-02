@@ -34,7 +34,7 @@ class Queue {
 
     console.log(rs);
 
-    return rs ? rs : false;
+    return rs.length > 0 ? rs : false;
   }
 
   public async deleteFromQueueById(id_catador: number, id_pedido: number) {
@@ -45,6 +45,8 @@ class Queue {
           id_pedido,
         },
       });
+
+      console.log(result);
 
       return result ? result : false;
     } catch (error) {

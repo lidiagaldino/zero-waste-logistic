@@ -10,6 +10,14 @@ class FindOrder {
 
     return rs ? rs : false;
   }
+
+  public async findOrderByGerador(id_gerador) {
+    const rs = await prisma.pedido.findMany({
+      where: {
+        id_gerador
+      }
+    })
+  }
 }
 
 export default new FindOrder();

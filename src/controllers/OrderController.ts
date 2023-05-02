@@ -18,19 +18,38 @@ class OrderController {
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
-      const queue: { id_catador: number; distancia: number }[] =
-        (await FindNearestCollector.findNearestCollector(
-          body.id_endereco,
-          body.id_materiais
-        )) as {
-          id_catador: number;
-          distancia: number;
-        }[];
+      let queue: { id_catador: number; distancia: number }[]
+      let createQueue: false | {
+        id_catador: number;
+        id_pedido: number;
+        distancia: number;
+      }[]
 
-      const createQueue = await Queue.storeQueue(queue, order.id);
+      try {
+        queue =
+          (await FindNearestCollector.findNearestCollector(
+            body.id_endereco,
+            body.id_materiais
+          )) as {
+            id_catador: number;
+            distancia: number;
+          }[];
+
+        createQueue = await Queue.storeQueue(queue, order.id);
+
+      } catch (error) {
+        await CreateOrder.deleteOrder(order.id);
+        app.io.to(`gerador_${order.id_gerador}`).emit('orderError', 'Não foi possível criar a fila')
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ message: "Não foi possível criar a fila" });
+      }
+
+
 
       if (!createQueue) {
         await CreateOrder.deleteOrder(order.id);
+        app.io.to(`gerador_${order.id_gerador}`).emit('orderError', 'Não foi possível criar a fila')
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: "Não foi possível criar a fila" });
@@ -93,6 +112,7 @@ class OrderController {
           "orderError",
           "Seu pedido teve que ser cancelado pois não existem pessoas disponíveis para atende-lo"
         );
+      return res.status(StatusCodes.OK).json({});
     }
 
     app.io.to(`catador_${queue[0].id_catador}`).emit("newOrder", order);
@@ -108,6 +128,7 @@ class OrderController {
       const queue = await Queue.deleteQueue(Number(id));
 
       if (queue) {
+        await CollectorStatus.onlineCollector(result.id_catador)
         return res.status(StatusCodes.OK).json(result);
       }
 
