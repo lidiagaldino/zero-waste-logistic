@@ -6,7 +6,7 @@ class CreateOrder {
     try {
       const newOrder = await prisma.pedido.create({
         data: {
-          id_status: 2,
+          id_status: 1,
           id_gerador: order.id_gerador,
           id_endereco: order.id_endereco,
         },

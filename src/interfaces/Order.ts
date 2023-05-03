@@ -6,5 +6,5 @@ export default interface IOrder {
   id_endereco: number;
   created_at?: Date;
   finished_at?: Date;
-  status: string;
+  status?: string;
 }

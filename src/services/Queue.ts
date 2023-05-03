@@ -30,6 +30,9 @@ class Queue {
       where: {
         id_pedido,
       },
+      orderBy: {
+        distancia: "asc",
+      },
     });
 
     console.log(rs);

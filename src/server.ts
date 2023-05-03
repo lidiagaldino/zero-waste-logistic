@@ -52,14 +52,17 @@ app.io.on("connection", async (socket) => {
     socket.broadcast.emit("orderError", order);
   });
 
-  socket.on('disconnect', async () => {
-    console.log('euu');
-    if (decoded.user_type == 'CATADOR') {
-      console.log('disconnect');
-      await CollectorStatus.offlineCollector(decoded.id_modo)
-    }
-  })
+  socket.on("finishOrder", (order) => {
+    socket.broadcast.emit("finishOrder", order);
+  });
 
+  socket.on("disconnect", async () => {
+    console.log("euu");
+    if (decoded.user_type == "CATADOR") {
+      console.log("disconnect");
+      await CollectorStatus.offlineCollector(decoded.id_modo);
+    }
+  });
 });
 
 app.httpServer.listen(port, () => console.log("App rodando"));

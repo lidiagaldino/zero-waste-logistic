@@ -18,43 +18,46 @@ class OrderController {
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
-      let queue: { id_catador: number; distancia: number }[]
-      let createQueue: false | {
-        id_catador: number;
-        id_pedido: number;
-        distancia: number;
-      }[]
-
-      try {
-        queue =
-          (await FindNearestCollector.findNearestCollector(
-            body.id_endereco,
-            body.id_materiais
-          )) as {
+      let queue: { id_catador: number; distancia: number }[];
+      let createQueue:
+        | false
+        | {
             id_catador: number;
+            id_pedido: number;
             distancia: number;
           }[];
 
-        createQueue = await Queue.storeQueue(queue, order.id);
+      try {
+        queue = (await FindNearestCollector.findNearestCollector(
+          body.id_endereco,
+          body.id_materiais
+        )) as {
+          id_catador: number;
+          distancia: number;
+        }[];
 
+        createQueue = await Queue.storeQueue(queue, order.id);
       } catch (error) {
         await CreateOrder.deleteOrder(order.id);
-        app.io.to(`gerador_${order.id_gerador}`).emit('orderError', 'Não foi possível criar a fila')
+        app.io
+          .to(`gerador_${order.id_gerador}`)
+          .emit("orderError", "Não foi possível criar a fila");
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: "Não foi possível criar a fila" });
       }
-
-
 
       if (!createQueue) {
         await CreateOrder.deleteOrder(order.id);
-        app.io.to(`gerador_${order.id_gerador}`).emit('orderError', 'Não foi possível criar a fila')
+        app.io
+          .to(`gerador_${order.id_gerador}`)
+          .emit("orderError", "Não foi possível criar a fila");
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: "Não foi possível criar a fila" });
       }
 
+      await CollectorStatus.busyCollector(createQueue[0].id_catador);
       app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
       return res.status(StatusCodes.CREATED).json(order);
     }
@@ -76,6 +79,8 @@ class OrderController {
       Number(id),
       req.user.id_modo
     );
+
+    console.log(updateOrder);
 
     if (updateOrder) {
       await CollectorStatus.busyCollector(req.user.id_modo);
@@ -102,6 +107,7 @@ class OrderController {
         .json({ errorsResult: "Pedido não existe" });
 
     Queue.deleteFromQueueById(req.user.id_modo, Number(id));
+    await CollectorStatus.onlineCollector(Number(id));
     const queue = await Queue.getQueue(Number(id));
 
     if (!queue) {
@@ -128,7 +134,8 @@ class OrderController {
       const queue = await Queue.deleteQueue(Number(id));
 
       if (queue) {
-        await CollectorStatus.onlineCollector(result.id_catador)
+        await CollectorStatus.onlineCollector(result.id_catador);
+        app.io.to(`gerador_${result.id_gerador}`).emit("finishOrder", result);
         return res.status(StatusCodes.OK).json(result);
       }
 

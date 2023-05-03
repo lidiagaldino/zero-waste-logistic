@@ -9,7 +9,7 @@ class AcceptOrder {
         },
         data: {
           id_catador,
-          id_status: 1,
+          id_status: 2,
         },
       });
 

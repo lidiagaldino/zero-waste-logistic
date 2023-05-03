@@ -6,7 +6,7 @@ interface IBodyProps extends Omit<IOrder, "id"> {}
 export const orderBodyValidation: yup.SchemaOf<IBodyProps> = yup
   .object()
   .shape({
-    status: yup.string().required(),
+    status: yup.string().notRequired(),
     id_endereco: yup.number().integer().required(),
     id_gerador: yup.number().integer().required(),
     id_materiais: yup.array().of(yup.number().integer().required()),
