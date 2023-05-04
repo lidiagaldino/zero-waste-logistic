@@ -11,7 +11,7 @@ class FindGenerator {
       },
     });
 
-    return gerador;
+    return gerador ? gerador : false;
   }
 }
 

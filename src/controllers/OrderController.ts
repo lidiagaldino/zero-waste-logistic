@@ -153,6 +153,29 @@ class OrderController {
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ message: "Não foi possível finalizar o pedido" });
   }
+
+  public async cancelOrder(req: Request<TParams, {}, {}>, res: Response) {
+    const { id } = req.params;
+
+    const order = await FindOrder.findOrder(Number(id));
+
+    const rs = await AcceptOrder.cancelOrder(
+      Number(id),
+      order ? order.id_catador : null
+    );
+
+    if (rs && order) {
+      app.io
+        .to(`catador_${order.id_catador}`)
+        .emit("canceledOrder", "Pedido foi cancelado pelo cliente");
+
+      return res.status(StatusCodes.NO_CONTENT).json({});
+    }
+
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: "Algo deu errado" });
+  }
 }
 
 export default new OrderController();

@@ -42,6 +42,45 @@ class AcceptOrder {
       return false;
     }
   }
+
+  public async cancelOrder(id: number, id_catador: number): Promise<boolean> {
+    try {
+      if (id_catador == null) {
+        return false;
+      }
+
+      await prisma.materiaisPedido.deleteMany({
+        where: {
+          id_pedido: id,
+        },
+      });
+
+      await prisma.filaPedidoCatador.deleteMany({
+        where: {
+          id_pedido: id,
+        },
+      });
+
+      await prisma.pedido.delete({
+        where: {
+          id,
+        },
+      });
+
+      await prisma.catador.update({
+        where: {
+          id: id_catador,
+        },
+        data: {
+          id_status_catador: 1,
+        },
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 export default new AcceptOrder();

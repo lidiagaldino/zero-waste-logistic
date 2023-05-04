@@ -8,6 +8,8 @@ import { geradorAlreadyHasOrder } from "../middleware/geradorAlreadyHasOrder";
 import { catadorOrder } from "../middleware/catadorOrder";
 import { verifyOrderStatus } from "../middleware/verifyOrderStatus";
 import { verifyQueue } from "../middleware/verifyQueue";
+import { geradorOrder } from "../middleware/geradorOrder";
+import { isGerador } from "../middleware/isGerador";
 const routes = Router();
 
 routes.post(
@@ -42,6 +44,15 @@ routes.put(
   catadorOrder,
   verifyOrderStatus(2),
   orderController.finishOrder
+);
+
+routes.delete(
+  "/cancel/:id",
+  auth,
+  isGerador,
+  geradorOrder,
+  verifyOrderStatus(2),
+  orderController.cancelOrder
 );
 
 export default routes;
