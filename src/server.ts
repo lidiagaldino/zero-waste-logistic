@@ -24,20 +24,24 @@ app.io.on("connection", async (socket) => {
     socket.disconnect();
   }
 
-  if (decoded.user_type === "CATADOR") {
-    socket.join(`catador_${decoded.id_modo}`);
-    console.log("catador");
-    const status = await CollectorStatus.onlineCollector(
-      Number(decoded.id_modo)
-    );
-    if (!status) socket.disconnect();
-    //return null;
-  }
+  try {
+    if (decoded.user_type === "CATADOR") {
+      socket.join(`catador_${decoded.id_modo}`);
+      console.log("catador");
+      const status = await CollectorStatus.onlineCollector(
+        Number(decoded.id_modo)
+      );
+      if (!status) socket.disconnect();
+      //return null;
+    }
 
-  if (decoded.user_type === "GERADOR") {
-    socket.join(`gerador_${decoded.id_modo}`);
-    console.log("gerador");
-    //return null;
+    if (decoded.user_type === "GERADOR") {
+      socket.join(`gerador_${decoded.id_modo}`);
+      console.log("gerador");
+      //return null;
+    }
+  } catch (error) {
+    socket.disconnect();
   }
 
   socket.on("newOrder", (order) => {

@@ -1,8 +1,11 @@
 import IOrder from "../interfaces/Order";
+import IOrderData from "../interfaces/OrderData";
 import prisma from "../lib/db";
 
 class CreateOrder {
-  public async createOrder(order: Omit<IOrder, "id">) {
+  public async createOrder(
+    order: Omit<IOrder, "id">
+  ): Promise<IOrderData | false> {
     try {
       const newOrder = await prisma.pedido.create({
         data: {
@@ -22,9 +25,39 @@ class CreateOrder {
         data,
       });
 
+      const endereco = await prisma.endereco.findUnique({
+        where: {
+          id: order.id_endereco,
+        },
+      });
+
+      const getMateriais = await prisma.materiaisPedido.findMany({
+        where: {
+          id_pedido: newOrder.id,
+        },
+        select: {
+          material: {
+            select: {
+              nome: true,
+            },
+          },
+        },
+      });
+
+      const retorno: IOrderData = {
+        id_status: newOrder.id_status,
+        id_gerador: newOrder.id_gerador,
+        endereco,
+        id_material: getMateriais,
+        created_at: newOrder.created_at,
+        finished_at: newOrder.finished_at,
+        id_catador: newOrder.id_catador,
+        id: newOrder.id,
+      };
+
       console.log(materiais);
 
-      return newOrder;
+      return retorno;
     } catch (error) {
       console.log(error);
       return false;

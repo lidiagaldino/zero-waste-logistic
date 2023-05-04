@@ -10,12 +10,15 @@ import FindOrder from "../services/FindOrder";
 import Queue from "../services/Queue";
 import FinishOrder from "../services/FinishOrder";
 import CollectorStatus from "../services/CollectorStatus";
+import IOrderData from "../interfaces/OrderData";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
     const body = req.body;
 
-    const order = await CreateOrder.createOrder(body);
+    const order: IOrderData = (await CreateOrder.createOrder(
+      body
+    )) as IOrderData;
 
     if (order) {
       let queue: { id_catador: number; distancia: number }[];
@@ -56,6 +59,8 @@ class OrderController {
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: "Não foi possível criar a fila" });
       }
+
+      order.distancia = createQueue[0].distancia;
 
       await CollectorStatus.busyCollector(createQueue[0].id_catador);
       app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
