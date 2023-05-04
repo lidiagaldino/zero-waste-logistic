@@ -72,6 +72,19 @@ class OrderController {
       .json({ message: "Não foi possível cadastrar o pedido" });
   }
 
+  public async storeWithSpecificCollector(
+    req: Request<TParams, {}, Omit<IOrder, "id">>,
+    res: Response
+  ) {
+    const { id } = req.params;
+    const body = req.body;
+
+    const order = await CreateOrder.createOrder(body);
+
+    if (order) {
+    }
+  }
+
   public async update(req: Request<TParams, {}, {}>, res: Response) {
     const { id } = req.params;
 
