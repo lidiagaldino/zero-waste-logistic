@@ -76,6 +76,9 @@ class Queue {
     const rs = await prisma.filaPedidoCatador.findFirst({
       where: {
         id_catador,
+        catador: {
+          id_status_catador: 3,
+        },
         pedido: {
           id_status: 1,
         },
