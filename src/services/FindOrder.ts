@@ -1,3 +1,4 @@
+import { Pedido } from "@prisma/client";
 import prisma from "../lib/db";
 
 class FindOrder {

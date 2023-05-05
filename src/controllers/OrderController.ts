@@ -11,6 +11,7 @@ import Queue from "../services/Queue";
 import FinishOrder from "../services/FinishOrder";
 import CollectorStatus from "../services/CollectorStatus";
 import IOrderData from "../interfaces/OrderData";
+import FindCollector from "../services/FindCollector";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
@@ -79,9 +80,51 @@ class OrderController {
     const { id } = req.params;
     const body = req.body;
 
+    const isCollectorBusy = await FindCollector.findCollector(Number(id));
+
+    if (isCollectorBusy.id_status_catador != 1) {
+      app.io
+        .to(`gerador_${body.id_gerador}`)
+        .emit("orderError", "Catador não está disponível");
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Catador não está disponível" });
+    }
+
     const order = await CreateOrder.createOrder(body);
 
     if (order) {
+      let queue: { id_catador: number; distancia: number }[];
+      let createQueue:
+        | false
+        | {
+            id_catador: number;
+            id_pedido: number;
+            distancia: number;
+          }[];
+
+      try {
+        queue = (await FindNearestCollector.getDistance(
+          Number(id),
+          body.id_endereco
+        )) as { id_catador: number; distancia: number }[];
+
+        createQueue = await Queue.storeQueue(queue, order.id);
+      } catch (error) {
+        await CreateOrder.deleteOrder(order.id);
+        app.io
+          .to(`gerador_${order.id_gerador}`)
+          .emit("orderError", "Não foi possível criar a fila");
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ message: "Não foi possível criar a fila" });
+      }
+
+      order.distancia = createQueue[0].distancia;
+
+      await CollectorStatus.busyCollector(createQueue[0].id_catador);
+      app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
+      return res.status(StatusCodes.CREATED).json(order);
     }
   }
 

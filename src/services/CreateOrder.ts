@@ -1,3 +1,4 @@
+import { Endereco } from "@prisma/client";
 import IOrder from "../interfaces/Order";
 import IOrderData from "../interfaces/OrderData";
 import prisma from "../lib/db";

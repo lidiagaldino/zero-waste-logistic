@@ -20,10 +20,19 @@ routes.post(
   orderController.store
 );
 
+routes.post(
+  "/:id",
+  validation({ body: orderBodyValidation }),
+  auth,
+  isCatador("params"),
+  geradorAlreadyHasOrder,
+  orderController.storeWithSpecificCollector
+);
+
 routes.put(
   "/:id",
   auth,
-  isCatador,
+  isCatador("user"),
   verifyOrderStatus(1),
   verifyQueue,
   orderController.update
@@ -32,7 +41,7 @@ routes.put(
 routes.put(
   "/deny/:id",
   auth,
-  isCatador,
+  isCatador("user"),
   verifyQueue,
   orderController.denyOrder
 );
@@ -40,7 +49,7 @@ routes.put(
 routes.put(
   "/finish/:id",
   auth,
-  isCatador,
+  isCatador("user"),
   catadorOrder,
   verifyOrderStatus(2),
   orderController.finishOrder

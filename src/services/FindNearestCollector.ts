@@ -41,11 +41,35 @@ class FindNearestCollector {
     return queue.length > 0 ? queue : false;
   }
 
-  public async getDistance(id_catador: number) {
+  public async getDistance(id_catador: number, id_endereco: number) {
     try {
+      const getLatLong = await prisma.endereco.findUnique({
+        where: {
+          id: id_endereco,
+        },
+      });
+
+      if (!getLatLong) return false;
+
       const sql = `
-        SELECT tbl_materiais_catador.id_catador as id_catador 
+        SELECT tbl_materiais_catador.id_catador as id_catador,
+        ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distancia
+        FROM tbl_materiais_catador
+      INNER JOIN tbl_materiais ON tbl_materiais.id = tbl_materiais_catador.id_materiais
+      INNER JOIN tbl_catador ON tbl_catador.id = tbl_materiais_catador.id_catador
+      INNER JOIN tbl_status_catador ON tbl_catador.id_status_catador = tbl_status_catador.id
+      INNER JOIN tbl_usuario ON tbl_usuario.id = tbl_catador.id_usuario
+      LEFT JOIN tbl_pessoa_fisica ON tbl_pessoa_fisica.id_usuario = tbl_usuario.id
+      LEFT JOIN tbl_pessoa_juridica ON tbl_pessoa_juridica.id_usuario = tbl_usuario.id
+      INNER JOIN tbl_endereco_usuario ON tbl_usuario.id = tbl_endereco_usuario.id_usuario
+      INNER JOIN tbl_endereco ON tbl_endereco.id = tbl_endereco_usuario.id_endereco
+      WHERE id_catador = ${id_catador}
       `;
+
+      const result: { id_catador: number; distancia: number }[] =
+        await prisma.$queryRawUnsafe(sql);
+
+      return result.length > 0 ? result : false;
     } catch (error) {
       return false;
     }

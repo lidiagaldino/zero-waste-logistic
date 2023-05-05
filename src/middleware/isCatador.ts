@@ -4,20 +4,23 @@ import jwt from "jsonwebtoken";
 import { IPayload } from "../interfaces/Jwt";
 import FindCollector from "../services/FindCollector";
 
-export const isCatador = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { id_modo } = req.user;
+export const isCatador =
+  (mode: "user" | "params") =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    let id: number;
 
-  const exists = await FindCollector.findCollector(id_modo);
-  console.log(exists);
+    if (mode == "user") {
+      id = req.user.id_modo;
+    } else {
+      id = Number(req.params.id);
+    }
 
-  if (!exists)
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: "Não autorizado" });
+    const exists = await FindCollector.findCollector(id);
 
-  next();
-};
+    if (!exists)
+      return res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: "Catador não existe" });
+
+    next();
+  };

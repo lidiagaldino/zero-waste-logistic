@@ -57,16 +57,17 @@ model StatusCatador {
 
 model Catador {
   id                Int                 @id @unique @default(autoincrement())
-  status_catador    StatusCatador       @relation(fields: [id_status_catador], references: [id])
   id_usuario        Int
+  id_status_catador Int
+  status_catador    StatusCatador       @relation(fields: [id_status_catador], references: [id])
   user              Usuario             @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   FavoritarCatador  FavoritarCatador[]
+  FilaPedidoCatador FilaPedidoCatador[]
   materiais_catador MateriaisCatador[]
   Pedido            Pedido[]
-  FilaPedidoCatador FilaPedidoCatador[]
-  id_status_catador Int
 
   @@index([id_usuario], map: "tbl_catador_id_usuario_fkey")
+  @@index([id_status_catador], map: "tbl_catador_id_status_catador_fkey")
   @@map("tbl_catador")
 }
 
@@ -99,8 +100,8 @@ model Endereco {
   estado           String
   cep              String
   complemento      String?
-  latitude         String
-  longitude        String
+  latitude         Float
+  longitude        Float
   apelido          String
   numero           String
   endereco_usuario EnderecoUsuario[]
@@ -169,29 +170,32 @@ model Pedido {
   created_at        DateTime            @default(now())
   finished_at       DateTime?
   id_catador        Int?
-  id_endereco       Int
   id_gerador        Int
-  MateriaisPedido   MateriaisPedido[]
-  tbl_gerador       Gerador             @relation(fields: [id_gerador], references: [id])
-  catador           Catador?            @relation(fields: [id_catador], references: [id])
-  endereco          Endereco            @relation(fields: [id_endereco], references: [id], onDelete: Cascade)
-  status            Status              @relation(fields: [id_status], references: [id])
+  id_endereco       Int
   id_status         Int
   FilaPedidoCatador FilaPedidoCatador[]
+  MateriaisPedido   MateriaisPedido[]
+  catador           Catador?            @relation(fields: [id_catador], references: [id])
+  endereco          Endereco            @relation(fields: [id_endereco], references: [id], onDelete: Cascade)
+  tbl_gerador       Gerador             @relation(fields: [id_gerador], references: [id])
+  status            Status              @relation(fields: [id_status], references: [id])
 
   @@index([id_catador], map: "tbl_pedido_id_catador_fkey")
   @@index([id_endereco], map: "tbl_pedido_id_endereco_fkey")
   @@index([id_gerador], map: "tbl_pedido_id_gerador_fkey")
+  @@index([id_status], map: "tbl_pedido_id_status_fkey")
   @@map("tbl_pedido")
 }
 
 model FilaPedidoCatador {
   id         Int     @id @unique @default(autoincrement())
   distancia  Int
-  pedido     Pedido  @relation(fields: [id_pedido], references: [id])
   id_pedido  Int
-  catador    Catador @relation(fields: [id_catador], references: [id])
   id_catador Int
+  catador    Catador @relation(fields: [id_catador], references: [id])
+  pedido     Pedido  @relation(fields: [id_pedido], references: [id])
 
+  @@index([id_catador], map: "tbl_fila_pedido_catador_id_catador_fkey")
+  @@index([id_pedido], map: "tbl_fila_pedido_catador_id_pedido_fkey")
   @@map("tbl_fila_pedido_catador")
 }
