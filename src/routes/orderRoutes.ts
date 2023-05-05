@@ -64,4 +64,6 @@ routes.delete(
   orderController.cancelOrder
 );
 
+routes.get("/", auth, isCatador("user"), orderController.verifyCatadorQueue);
+
 export default routes;

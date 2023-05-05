@@ -1,3 +1,4 @@
+import { FilaPedidoCatador } from "@prisma/client";
 import IQueue from "../interfaces/Queue";
 import prisma from "../lib/db";
 
@@ -69,6 +70,26 @@ class Queue {
     } catch (error) {
       return false;
     }
+  }
+
+  public async findCollectorQueue(id_catador: number) {
+    const rs = await prisma.filaPedidoCatador.findFirst({
+      where: {
+        id_catador,
+        pedido: {
+          id_status: 1,
+        },
+      },
+      select: {
+        pedido: {
+          include: {
+            endereco: true,
+          },
+        },
+      },
+    });
+
+    return rs ? rs : false;
   }
 }
 

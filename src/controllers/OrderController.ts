@@ -232,6 +232,18 @@ class OrderController {
       .status(StatusCodes.BAD_REQUEST)
       .json({ message: "Algo deu errado" });
   }
+
+  public async verifyCatadorQueue(req: Request, res: Response) {
+    const { id_modo } = req.user;
+
+    const rs = await Queue.findCollectorQueue(id_modo);
+
+    return rs
+      ? res.status(StatusCodes.OK).json(rs)
+      : res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ message: "Não existem pedidos pendentes" });
+  }
 }
 
 export default new OrderController();
