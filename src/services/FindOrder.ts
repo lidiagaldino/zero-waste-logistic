@@ -28,6 +28,28 @@ class FindOrder {
           id_status: 3,
         },
       },
+      include: {
+        catador: {
+          select: {
+            id: true,
+          },
+        },
+        endereco: true,
+        FilaPedidoCatador: {
+          select: {
+            distancia: true,
+          },
+        },
+        MateriaisPedido: {
+          select: {
+            material: {
+              select: {
+                nome: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return rs.length > 0 ? rs : false;
