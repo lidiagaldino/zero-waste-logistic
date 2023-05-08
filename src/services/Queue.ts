@@ -79,9 +79,6 @@ class Queue {
         catador: {
           id_status_catador: 3,
         },
-        pedido: {
-          id_status: 1,
-        },
       },
       select: {
         pedido: {
