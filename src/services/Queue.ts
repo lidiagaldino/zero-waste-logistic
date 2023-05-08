@@ -1,4 +1,4 @@
-import { FilaPedidoCatador } from "@prisma/client";
+import { FilaPedidoCatador, Pedido } from "@prisma/client";
 import IQueue from "../interfaces/Queue";
 import prisma from "../lib/db";
 
@@ -87,6 +87,20 @@ class Queue {
         pedido: {
           include: {
             endereco: true,
+            FilaPedidoCatador: {
+              select: {
+                distancia: true,
+              },
+            },
+            MateriaisPedido: {
+              select: {
+                material: {
+                  select: {
+                    nome: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
