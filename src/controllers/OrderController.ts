@@ -244,6 +244,16 @@ class OrderController {
           .status(StatusCodes.NOT_FOUND)
           .json({ message: "Não existem pedidos pendentes" });
   }
+
+  public async getOrderByGerador(req: Request, res: Response) {
+    const { id_modo } = req.user;
+
+    const rs = await FindOrder.findOrderByGerador(id_modo);
+
+    return rs
+      ? res.status(StatusCodes.OK).json(rs)
+      : res.status(StatusCodes.NOT_FOUND).json({ message: "NOT_FOUND" });
+  }
 }
 
 export default new OrderController();

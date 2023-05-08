@@ -66,4 +66,6 @@ routes.delete(
 
 routes.get("/", auth, isCatador("user"), orderController.verifyCatadorQueue);
 
+routes.get("/gerador", auth, isGerador, orderController.getOrderByGerador);
+
 export default routes;

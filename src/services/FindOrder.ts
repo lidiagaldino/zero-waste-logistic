@@ -16,8 +16,16 @@ class FindOrder {
     const rs = await prisma.pedido.findMany({
       where: {
         id_gerador,
-        id_status: {
-          not: 3,
+        OR: [
+          {
+            id_status: 1,
+          },
+          {
+            id_status: 2,
+          },
+        ],
+        NOT: {
+          id_status: 3,
         },
       },
     });
