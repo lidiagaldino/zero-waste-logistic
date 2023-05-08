@@ -3,10 +3,20 @@ import prisma from "../lib/db";
 class CollectorStatus {
   public async onlineCollector(id: number) {
     try {
-      const checkBusy = await prisma.catador.findMany({
+      const checkBusy = await prisma.pedido.findMany({
         where: {
-          id,
-          id_status_catador: 3,
+          id_catador: id,
+          OR: [
+            {
+              id_status: 1,
+            },
+            {
+              id_status: 2,
+            },
+          ],
+          NOT: {
+            id_status: 3,
+          },
         },
       });
 
