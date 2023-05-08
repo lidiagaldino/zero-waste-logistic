@@ -3,14 +3,14 @@ import prisma from "../lib/db";
 class CollectorStatus {
   public async onlineCollector(id: number) {
     try {
-      const checkBusy = await prisma.pedido.findMany({
+      const checkBusy = await prisma.catador.findMany({
         where: {
-          id_catador: id,
-          id_status: {
-            not: 3,
-          },
+          id,
+          id_status_catador: 3,
         },
       });
+
+      console.log(checkBusy);
 
       if (checkBusy.length > 0) {
         return true;
@@ -63,6 +63,19 @@ class CollectorStatus {
 
   public async offlineCollector(id: number) {
     try {
+      const checkBusy = await prisma.catador.findMany({
+        where: {
+          id,
+          id_status_catador: 3,
+        },
+      });
+
+      console.log(checkBusy);
+
+      if (checkBusy.length > 0) {
+        return true;
+      }
+
       const rs = await prisma.catador.update({
         where: {
           id,
