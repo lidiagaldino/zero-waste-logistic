@@ -3,20 +3,10 @@ import prisma from "../lib/db";
 class CollectorStatus {
   public async onlineCollector(id: number) {
     try {
-      const checkBusy = await prisma.pedido.findMany({
+      const checkBusy = await prisma.catador.findMany({
         where: {
-          id_catador: id,
-          OR: [
-            {
-              id_status: 1,
-            },
-            {
-              id_status: 2,
-            },
-          ],
-          NOT: {
-            id_status: 3,
-          },
+          id: id,
+          id_status_catador: 3,
         },
       });
 
@@ -26,6 +16,23 @@ class CollectorStatus {
         return true;
       }
 
+      const rs = await prisma.catador.update({
+        where: {
+          id,
+        },
+        data: {
+          id_status_catador: 1,
+        },
+      });
+
+      return rs;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async finishedOrder(id: number) {
+    try {
       const rs = await prisma.catador.update({
         where: {
           id,

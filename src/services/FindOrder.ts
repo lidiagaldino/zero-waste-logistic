@@ -29,11 +29,6 @@ class FindOrder {
         },
       },
       include: {
-        catador: {
-          select: {
-            id: true,
-          },
-        },
         endereco: true,
         FilaPedidoCatador: {
           select: {

@@ -195,7 +195,7 @@ class OrderController {
       const queue = await Queue.deleteQueue(Number(id));
 
       if (queue) {
-        await CollectorStatus.onlineCollector(result.id_catador);
+        await CollectorStatus.finishedOrder(result.id_catador);
         app.io.to(`gerador_${result.id_gerador}`).emit("finishOrder", result);
         return res.status(StatusCodes.OK).json(result);
       }
