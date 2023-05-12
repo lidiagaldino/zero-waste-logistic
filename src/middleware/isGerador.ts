@@ -17,5 +17,5 @@ export const isGerador = async (
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: "Não autorizado" });
 
-  next();
+  return next();
 };

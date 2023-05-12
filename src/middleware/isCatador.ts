@@ -22,5 +22,5 @@ export const isCatador =
         .status(StatusCodes.UNAUTHORIZED)
         .json({ message: "Catador não existe" });
 
-    next();
+    return next();
   };

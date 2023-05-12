@@ -8,6 +8,9 @@
     "build": "npx tsc",
     "start": "node ./bin/server.js"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "author": "Lídia Galdino",
   "license": "ISC",
   "devDependencies": {
@@ -21,7 +24,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@prisma/client": "^4.10.1",
+    "@prisma/client": "^4.11.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -30,7 +33,7 @@
     "http": "^0.0.1-security",
     "http-status-codes": "^2.2.0",
     "jsonwebtoken": "^9.0.0",
-    "prisma": "^4.10.1",
+    "prisma": "^4.11.0",
     "socket.io": "^4.6.1",
     "tsx": "^3.12.3",
     "yup": "^0.32.11"

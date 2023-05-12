@@ -65,6 +65,7 @@ model Catador {
   FilaPedidoCatador FilaPedidoCatador[]
   materiais_catador MateriaisCatador[]
   Pedido            Pedido[]
+  Avaliacao         Avaliacao[]
 
   @@index([id_usuario], map: "tbl_catador_id_usuario_fkey")
   @@index([id_status_catador], map: "tbl_catador_id_status_catador_fkey")
@@ -128,6 +129,7 @@ model Gerador {
   FavoritarCatador FavoritarCatador[]
   user             Usuario            @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
   tbl_pedido       Pedido[]
+  Avaliacao        Avaliacao[]
 
   @@index([id_usuario], map: "tbl_gerador_id_usuario_fkey")
   @@map("tbl_gerador")
@@ -198,4 +200,15 @@ model FilaPedidoCatador {
   @@index([id_catador], map: "tbl_fila_pedido_catador_id_catador_fkey")
   @@index([id_pedido], map: "tbl_fila_pedido_catador_id_pedido_fkey")
   @@map("tbl_fila_pedido_catador")
+}
+
+model Avaliacao {
+  id         Int     @id @unique @default(autoincrement())
+  nota       Float
+  gerador    Gerador @relation(fields: [id_gerador], references: [id])
+  catador    Catador @relation(fields: [id_catador], references: [id])
+  id_gerador Int
+  id_catador Int
+
+  @@map("tbl_avaliacao")
 }

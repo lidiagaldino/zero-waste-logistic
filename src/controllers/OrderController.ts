@@ -168,7 +168,7 @@ class OrderController {
         .json({ errorsResult: "Pedido não existe" });
 
     Queue.deleteFromQueueById(req.user.id_modo, Number(id));
-    await CollectorStatus.finishedOrder(Number(id));
+    await CollectorStatus.finishedOrder(req.user.id_modo);
     const queue = await Queue.getQueue(Number(id));
 
     if (!queue) {

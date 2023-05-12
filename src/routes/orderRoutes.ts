@@ -10,6 +10,7 @@ import { verifyOrderStatus } from "../middleware/verifyOrderStatus";
 import { verifyQueue } from "../middleware/verifyQueue";
 import { geradorOrder } from "../middleware/geradorOrder";
 import { isGerador } from "../middleware/isGerador";
+import { isLocation } from "../middleware/isLocation";
 const routes = Router();
 
 routes.post(
@@ -52,6 +53,7 @@ routes.put(
   isCatador("user"),
   catadorOrder,
   verifyOrderStatus(2),
+  isLocation,
   orderController.finishOrder
 );
 

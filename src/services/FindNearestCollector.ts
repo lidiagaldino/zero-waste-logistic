@@ -12,9 +12,9 @@ class FindNearestCollector {
 
     const sql = `
     SELECT tbl_materiais_catador.id_catador as id_catador,
-    ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${
-      getLatLong.longitude
-    }), POINT(latitude, longitude)) AS distancia,
+    ST_DISTANCE_SPHERE(POINT(${getLatLong.longitude}, ${
+      getLatLong.latitude
+    }), POINT(longitude, latitude)) AS distancia,
     COUNT(DISTINCT id_materiais) AS qtd_materiais
     FROM tbl_materiais_catador
       INNER JOIN tbl_materiais ON tbl_materiais.id = tbl_materiais_catador.id_materiais
@@ -25,9 +25,9 @@ class FindNearestCollector {
       LEFT JOIN tbl_pessoa_juridica ON tbl_pessoa_juridica.id_usuario = tbl_usuario.id
       INNER JOIN tbl_endereco_usuario ON tbl_usuario.id = tbl_endereco_usuario.id_usuario
       INNER JOIN tbl_endereco ON tbl_endereco.id = tbl_endereco_usuario.id_endereco
-    WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${
-      getLatLong.longitude
-    }), POINT(latitude, longitude)) <= 10000
+    WHERE ST_DISTANCE_SPHERE(POINT(${getLatLong.longitude}, ${
+      getLatLong.latitude
+    }), POINT(longitude, latitude)) <= 10000
       AND id_status_catador = 1
       AND id_materiais in (${materiais.toString()})
     GROUP BY id_catador, longitude, latitude
@@ -53,7 +53,7 @@ class FindNearestCollector {
 
       const sql = `
         SELECT tbl_materiais_catador.id_catador as id_catador,
-        ST_DISTANCE_SPHERE(POINT(${getLatLong.latitude}, ${getLatLong.longitude}), POINT(latitude, longitude)) AS distancia
+        ST_DISTANCE_SPHERE(POINT(${getLatLong.longitude}, ${getLatLong.latitude}), POINT(longitude, latitude)) AS distancia
         FROM tbl_materiais_catador
       INNER JOIN tbl_materiais ON tbl_materiais.id = tbl_materiais_catador.id_materiais
       INNER JOIN tbl_catador ON tbl_catador.id = tbl_materiais_catador.id_catador
