@@ -81,6 +81,8 @@ class AcceptOrder {
       return false;
     }
   }
+
+  public async;
 }
 
 export default new AcceptOrder();
