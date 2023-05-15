@@ -172,7 +172,8 @@ class OrderController {
     const queue = await Queue.getQueue(Number(id));
 
     if (!queue) {
-      await CreateOrder.deleteOrder(order.id);
+      const ordem = await CreateOrder.deleteOrder(order.id);
+      console.log(ordem);
       app.io
         .to(`gerador_${order.id_gerador}`)
         .emit(
