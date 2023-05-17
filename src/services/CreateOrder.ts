@@ -67,6 +67,15 @@ class CreateOrder {
 
   public async deleteOrder(id: number) {
     try {
+      const teste = await prisma.materiaisPedido.deleteMany({
+        where: {
+          id_pedido: id,
+        },
+      });
+
+      console.log("object");
+
+      console.log(teste);
       const result = await prisma.pedido.delete({
         where: {
           id,
@@ -75,6 +84,7 @@ class CreateOrder {
 
       return result;
     } catch (error) {
+      console.log(error);
       return false;
     }
   }

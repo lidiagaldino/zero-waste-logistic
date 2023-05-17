@@ -170,6 +170,8 @@ class OrderController {
     Queue.deleteFromQueueById(req.user.id_modo, Number(id));
     await CollectorStatus.finishedOrder(req.user.id_modo);
     const queue = await Queue.getQueue(Number(id));
+    console.log("occbject");
+    console.log(queue);
 
     if (!queue) {
       const ordem = await CreateOrder.deleteOrder(order.id);

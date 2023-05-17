@@ -89,6 +89,16 @@ class Queue {
                 distancia: true,
               },
             },
+            tbl_gerador: {
+              select: {
+                user: {
+                  select: {
+                    pessoa_fisica: true,
+                    pessoa_juridica: true,
+                  },
+                },
+              },
+            },
             MateriaisPedido: {
               select: {
                 material: {
