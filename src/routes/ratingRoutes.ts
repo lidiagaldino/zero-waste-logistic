@@ -27,4 +27,6 @@ routes.put(
 
 routes.get("/:id", RatingController.average);
 
+routes.get("/my/:id", auth, isGerador, RatingController.findRatingByGerador);
+
 export default routes;

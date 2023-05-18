@@ -41,6 +41,20 @@ class RatingControlller {
       ? res.status(StatusCodes.OK).json(result[0])
       : res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({});
   }
+
+  public async findRatingByGerador(
+    req: Request<TParams, {}, {}>,
+    res: Response
+  ) {
+    const { id_modo } = req.user;
+    const { id } = req.params;
+
+    const result = await Rating.findRatingByGerador(id_modo, Number(id));
+
+    return result
+      ? res.status(StatusCodes.OK).json(result[0])
+      : res.status(StatusCodes.NOT_FOUND).json({});
+  }
 }
 
 export default new RatingControlller();
