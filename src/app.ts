@@ -6,6 +6,7 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import orderRoutes from "./routes/orderRoutes";
 import userRoutes from "./routes/userRoutes";
 import ratingRoutes from "./routes/ratingRoutes";
+import couponRoutes from "./routes/couponRoutes";
 
 class App {
   public app: express.Application;
@@ -46,6 +47,7 @@ class App {
     this.app.use("/order", orderRoutes);
     this.app.use("/user", userRoutes);
     this.app.use("/rating", ratingRoutes);
+    this.app.use("/coupon", couponRoutes);
   }
 }
 

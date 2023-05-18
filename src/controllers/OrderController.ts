@@ -12,6 +12,7 @@ import FinishOrder from "../services/FinishOrder";
 import CollectorStatus from "../services/CollectorStatus";
 import IOrderData from "../interfaces/OrderData";
 import FindCollector from "../services/FindCollector";
+import Coupon from "../services/Coupon";
 
 class OrderController {
   public async store(req: Request<{}, {}, Omit<IOrder, "id">>, res: Response) {
@@ -199,6 +200,10 @@ class OrderController {
 
       if (queue) {
         await CollectorStatus.finishedOrder(result.id_catador);
+        await Coupon.storePontos(
+          Number(req.user.id_usuario),
+          result.id_gerador
+        );
         app.io.to(`gerador_${result.id_gerador}`).emit("finishOrder", result);
         return res.status(StatusCodes.OK).json(result);
       }

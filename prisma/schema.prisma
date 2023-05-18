@@ -15,11 +15,13 @@ model Usuario {
   telefone         String
   biografia        String?
   foto             String
+  pontos           Int
   catador          Catador[]
   endereco_usuario EnderecoUsuario[]
   gerador          Gerador[]
   pessoa_fisica    PessoaFisica[]
   pessoa_juridica  PessoaJuridica[]
+  CupomUsuario     CupomUsuario[]
 
   @@map("tbl_usuario")
 }
@@ -211,4 +213,26 @@ model Avaliacao {
   id_catador Int
 
   @@map("tbl_avaliacao")
+}
+
+model Cupom {
+  id           Int            @id @unique @default(autoincrement())
+  nome         String
+  descricao    String
+  criterios    String
+  pontos       Int
+  codigo       String
+  CupomUsuario CupomUsuario[]
+
+  @@map("tbl_cupom")
+}
+
+model CupomUsuario {
+  id         Int     @id @unique @default(autoincrement())
+  cupom      Cupom   @relation(fields: [id_cupom], references: [id])
+  usuario    Usuario @relation(fields: [id_usuario], references: [id])
+  id_cupom   Int
+  id_usuario Int
+
+  @@map("tbl_cupom_usuario")
 }
