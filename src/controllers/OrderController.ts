@@ -125,6 +125,7 @@ class OrderController {
 
       await CollectorStatus.busyCollector(createQueue[0].id_catador);
       app.io.to(`catador_${createQueue[0].id_catador}`).emit("newOrder", order);
+      app.io.to(`gerador_${order.id_gerador}`).emit("newOrder", order);
       return res.status(StatusCodes.CREATED).json(order);
     }
   }
