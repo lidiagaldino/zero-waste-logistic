@@ -139,7 +139,7 @@ class Coupon {
         },
       });
 
-      return rs;
+      return cupom;
     } catch (error) {
       return false;
     }
