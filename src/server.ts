@@ -13,15 +13,21 @@ app.io.on("connection", async (socket) => {
 
   let decoded: IPayload;
 
-  if (!socket.handshake.auth || !socket.handshake.auth.token)
+  if (!socket.handshake.auth || !socket.handshake.auth.token) {
+    console.log(socket.handshake.auth);
     socket.disconnect();
+    return null;
+  }
 
   try {
     decoded = jwt.verify(socket.handshake.auth.token, "secret") as IPayload;
     console.log(decoded);
   } catch (error) {
     socket.emit("InvalidToken", "token invalido");
+    console.log("invalid");
+
     socket.disconnect();
+    return null;
   }
 
   try {
@@ -32,7 +38,7 @@ app.io.on("connection", async (socket) => {
         Number(decoded.id_modo)
       );
       if (!status) socket.disconnect();
-      //return null;
+      console.log(socket.handshake.auth.token);
     }
 
     if (decoded.user_type === "GERADOR") {

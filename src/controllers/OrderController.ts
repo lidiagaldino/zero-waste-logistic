@@ -169,7 +169,9 @@ class OrderController {
         .status(StatusCodes.BAD_REQUEST)
         .json({ errorsResult: "Pedido não existe" });
 
-    Queue.deleteFromQueueById(req.user.id_modo, Number(id));
+    console.log(req.user.id_modo);
+
+    await Queue.deleteFromQueueById(req.user.id_modo, Number(id));
     await CollectorStatus.finishedOrder(req.user.id_modo);
     const queue = await Queue.getQueue(Number(id));
     console.log("occbject");

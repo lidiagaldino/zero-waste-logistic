@@ -51,6 +51,7 @@ class Queue {
       });
 
       console.log(result);
+      console.log("teste");
 
       return result ? result : false;
     } catch (error) {

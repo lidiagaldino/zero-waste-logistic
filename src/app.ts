@@ -7,6 +7,7 @@ import orderRoutes from "./routes/orderRoutes";
 import userRoutes from "./routes/userRoutes";
 import ratingRoutes from "./routes/ratingRoutes";
 import couponRoutes from "./routes/couponRoutes";
+import mongoose from "mongoose";
 
 class App {
   public app: express.Application;
