@@ -189,6 +189,7 @@ class OrderController {
       return res.status(StatusCodes.OK).json({});
     }
 
+    await CollectorStatus.busyCollector(queue[0].id_catador);
     app.io.to(`catador_${queue[0].id_catador}`).emit("newOrder", order);
     return res.status(StatusCodes.OK).json({});
   }
